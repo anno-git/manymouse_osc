@@ -28,7 +28,7 @@ static void sigintHandler(int x) {
   keepRunning = false;
 }
 
-int osc_send(SOCKET* fd, unsigned int device, unsigned int axis, int delta){
+int osc_send(int fd, unsigned int device, unsigned int axis, int delta){
   char buffer[2048]; // declare a 2Kb buffer to read packet data into
 
   int len = 0;
@@ -79,7 +79,7 @@ int main(int argc, char *argv[]) {
 #endif
 
   // open a socket to send for datagrams (i.e. UDP packets) on port 9001
-  SOCKET* fd_send = socket(AF_INET, SOCK_DGRAM, 0);
+  int fd_send = socket(AF_INET, SOCK_DGRAM, 0);
 
   // set the socket to non-blocking
 #ifndef _WIN32
