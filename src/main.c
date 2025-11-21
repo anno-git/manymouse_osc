@@ -25,6 +25,7 @@
 #include <unistd.h>
 #endif
 
+#include <string.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdbool.h>
