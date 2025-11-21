@@ -42,6 +42,62 @@ int osc_delta_send(int fd, unsigned int device, unsigned int axis, int delta, bo
   return res;
 }
 
+int osc_abs_send(int fd, unsigned int device, unsigned int axis, int pos, bool is_debug){
+  char buffer[2048]; // declare a 2Kb buffer to read packet data into
+
+  int len = 0;
+  len = tosc_writeMessage(buffer, sizeof(buffer), "/manymouse/absmotion", "iii", device, axis, pos);
+
+  if(is_debug){
+    tosc_printOscBuffer(buffer, len); // for debug
+  }
+
+  int res = send(fd, buffer, len, 0);
+  return res;
+}
+
+int osc_scroll_send(int fd, unsigned int device, unsigned int axis, int delta, bool is_debug){
+  char buffer[2048]; // declare a 2Kb buffer to read packet data into
+
+  int len = 0;
+  len = tosc_writeMessage(buffer, sizeof(buffer), "/manymouse/scroll", "iii", device, axis, delta);
+
+  if(is_debug){
+    tosc_printOscBuffer(buffer, len); // for debug
+  }
+
+  int res = send(fd, buffer, len, 0);
+  return res;
+}
+
+int osc_button_send(int fd, unsigned int device, unsigned int btn, int state, bool is_debug){
+  char buffer[2048]; // declare a 2Kb buffer to read packet data into
+
+  int len = 0;
+  len = tosc_writeMessage(buffer, sizeof(buffer), "/manymouse/button", "iii", device, btn, state);
+
+  if(is_debug){
+    tosc_printOscBuffer(buffer, len); // for debug
+  }
+
+  int res = send(fd, buffer, len, 0);
+  return res;
+}
+
+int osc_disconnect_send(int fd, unsigned int device, bool is_debug){
+  char buffer[2048]; // declare a 2Kb buffer to read packet data into
+
+  int len = 0;
+  len = tosc_writeMessage(buffer, sizeof(buffer), "/manymouse/disconnect", "i", device);
+
+  if(is_debug){
+    tosc_printOscBuffer(buffer, len); // for debug
+  }
+
+  int res = send(fd, buffer, len, 0);
+  return res;
+}
+
 /**
  * A basic program to listen to port 9000 and print received OSC packets.
  */
@@ -157,12 +213,43 @@ int main(int argc, char *argv[]) {
 
   while (keepRunning) {
     while(ManyMouse_PollEvent(&m)){
-      if(m.type == MANYMOUSE_EVENT_RELMOTION){
+      if(m.type == MANYMOUSE_EVENT_RELMOTION)
+      {
         unsigned int device = m.device;
         unsigned int axis = m.item;
         int delta = m.value;
 
         osc_delta_send(fd_send, device, axis, delta, is_verbose);
+      }
+      else if(m.type == MANYMOUSE_EVENT_ABSMOTION)
+      {
+        unsigned int device = m.device;
+        unsigned int axis = m.item;
+        int pos = m.value;
+
+        osc_abs_send(fd_send, device, axis, pos, is_verbose);
+      }
+      else if(m.type == MANYMOUSE_EVENT_SCROLL)
+      {
+        unsigned int device = m.device;
+        unsigned int axis = m.item;
+        int delta = m.value;
+
+        osc_scroll_send(fd_send, device, axis, delta, is_verbose);
+      }
+      else if(m.type == MANYMOUSE_EVENT_DISCONNECT)
+      {
+        unsigned int device = m.device;
+
+        osc_disconnect_send(fd_send, device, is_verbose);
+      }
+      else if(m.type == MANYMOUSE_EVENT_BUTTON)
+      {
+        unsigned int device = m.device;
+        unsigned int btn = m.item;
+        int state = m.value;
+
+        osc_button_send(fd_send, device, btn, state, is_verbose);
       }
     }
   }

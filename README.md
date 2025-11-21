@@ -24,6 +24,14 @@ options:
 
 - /manymouse/relmotion 3 1 -1 (type tags: iii)
     - device index, axis (0/horizontal or 1/vertical), delta
+- /manymouse/absmotion 3 1 1 (type tags: iii)
+    - device index, axis (0/horizontal or 1/vertical), pos
+- /manymouse/scroll 3 0 1 (type tags: iii)
+    - device index, axis (0/horizontal or 1/vertical), delta
+- /manymouse/button 3 0 1 (type tags: iii)
+    - device index, button index, state (0/release, 1/press)
+- /manymouse/disconnect 3 (type tags: i)
+    - device index
 
 ## Build
 
