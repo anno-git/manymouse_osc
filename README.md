@@ -42,10 +42,11 @@ cmake --build build --parallel 8 -j 8 --config Release
 
 ## Known Issues
 
-- Internal trackpad on Windows would not be detected. (Other USB drivers maybe also so. Not checked.)
+- Internal trackpad on Windows would not be detected. (Other some USB drivers maybe also so. Not checked all.)
 
 ## License (Dependencies)
 
 - [tinyosc](https://github.com/funatsufumiya/tinyosc): ISC License / Copyright (c) 2015, Martin Roth <mhroth@gmail.com>
 - [manymouse](https://github.com/icculus/manymouse): Zlib License / Copyright (c) 2005-2022 Ryan C. Gordon <icculus@icculus.org>.
 - [argparse](https://github.com/pollyren/argparse): MIT License / Copyright (c) 2025 pollyren
+
