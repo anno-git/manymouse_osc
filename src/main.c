@@ -28,13 +28,15 @@ static void sigintHandler(int x) {
   keepRunning = false;
 }
 
-int osc_send(int fd, unsigned int device, unsigned int axis, int delta){
+int osc_delta_send(int fd, unsigned int device, unsigned int axis, int delta, bool is_debug){
   char buffer[2048]; // declare a 2Kb buffer to read packet data into
 
   int len = 0;
   len = tosc_writeMessage(buffer, sizeof(buffer), "/manymouse/relmotion", "iii", device, axis, delta);
 
-  // tosc_printOscBuffer(buffer, len); // for debug
+  if(is_debug){
+    tosc_printOscBuffer(buffer, len); // for debug
+  }
 
   int res = send(fd, buffer, len, 0);
   return res;
@@ -45,29 +47,25 @@ int osc_send(int fd, unsigned int device, unsigned int axis, int delta){
  */
 int main(int argc, char *argv[]) {
 
+  bool is_verbose = false;
   const char *osc_out_host = "127.0.0.1";
   int osc_out_port = 9000;
 
   argument_parser_t arg_parser;
   argparse_init(&arg_parser, argc, argv, "manymouse_osc", "");
 
-  // argparse_arg_t arg2 = ARGPARSE_OPTION(
-  //     INT, 'p', "--port", &osc_out_port, "OSC out port"
-  // );
-
-  // argparse_arg_t arg3 = ARGPARSE_OPTION(
-  //     STRING, 'ht', "--host", &osc_out_host, "OSC out host"
-  // );
-
   argparse_arg_t args[] = {
     ARGPARSE_OPTION(INT, 'p', "--port", &osc_out_port, "OSC out port (default: 9000)"),
-    ARGPARSE_OPTION(STRING, 't', "--host", &osc_out_host, "OSC out host (default: 127.0.0.1)")
+    ARGPARSE_OPTION(STRING, 't', "--host", &osc_out_host, "OSC out host (default: 127.0.0.1)"),
+    ARGPARSE_COUNT('v', "--verbose", &is_verbose, "verbose mode")
   };
-  argparse_add_arguments(&arg_parser, args, 2);
-
+  argparse_add_arguments(&arg_parser, args, 3);
 
   argparse_parse_args(&arg_parser);
-  // argparse_print_help(&arg_parser);
+
+  if(is_verbose){
+    printf("verbose mode: on\n");
+  }
 
 #ifdef _WIN32
     WSADATA wsaData;
@@ -141,6 +139,12 @@ int main(int argc, char *argv[]) {
     return 1;
   }
 
+  printf("many mouse driver name: %s\n", ManyMouse_DriverName());
+
+  for(size_t i=0; i<device_count; ++i){
+    printf("%d: %s\n", i, ManyMouse_DeviceName(i));
+  }
+
   printf("many mouse device count: %d\n", device_count);
 
   // register the SIGINT handler (Ctrl+C)
@@ -158,7 +162,7 @@ int main(int argc, char *argv[]) {
         unsigned int axis = m.item;
         int delta = m.value;
 
-        osc_send(fd_send, device, axis, delta);
+        osc_delta_send(fd_send, device, axis, delta, is_verbose);
       }
     }
   }
