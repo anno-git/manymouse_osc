@@ -30,6 +30,7 @@
 #include <signal.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "tinyosc.h"
 
@@ -90,7 +91,8 @@ int main(int argc, char *argv[]) {
       close(fd_send);
     #endif
 
-    exit(1);
+    // exit(1);
+    return 1;
   }
 
   char buffer[2048]; // declare a 2Kb buffer to read packet data into
