@@ -50,15 +50,57 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
+  // open a socket to send for datagrams (i.e. UDP packets) on port 9001
+  int fd_send = socket(AF_INET, SOCK_DGRAM, 0);
+
+  // set the socket to non-blocking
+#ifndef _WIN32
+  fcntl(fd_send, F_SETFL, O_NONBLOCK); 
+#else
+  u_long mode_s = 1; // non blocking
+  ioctlsocket(fd_send, FIONBIO, &mode_s);
+#endif
+
+  struct sockaddr_in sout;
+  sout.sin_family = AF_INET;
+  // sout.sin_addr.s_addr = "127.0.0.1";
+  // sout.sin_addr = "127.0.0.1";
+  const char* out_addr = "127.0.0.1";
+  int out_port = 9001;
+  struct hostent *hostinfo;
+  hostinfo = gethostbyname(out_addr);
+  memcpy(&sout.sin_addr, hostinfo->h_addr_list[0], hostinfo->h_length);
+  sout.sin_port = htons(out_port);
+  // sout.sin_addr.s_addr = "localhost";
+  // int resb = bind(fd_send, (struct sockaddr *) &sout, sizeof(struct sockaddr_in));
+  int resb = connect(fd_send, (struct sockaddr*)&sout, sizeof(struct sockaddr_in));
+  // assert(resb != -1);
+  printf("connect result: %d\n", resb);
+
   char buffer[2048]; // declare a 2Kb buffer to read packet data into
 
   printf("Starting write tests:\n");
   int len = 0;
-  char blob[8] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF};
-  len = tosc_writeMessage(buffer, sizeof(buffer), "/address", "fsibTFNI",
-      1.0f, "hello world", -1, sizeof(blob), blob);
+  // char blob[8] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF};
+  // len = tosc_writeMessage(buffer, sizeof(buffer), "/address", "fsibTFNI",
+  //     1.0f, "hello world", -1, sizeof(blob), blob);
+  // char blob[8] = {0x01, 0x23, 0x45, 0x67, 0x89, 0xAB, 0xCD, 0xEF};
+  len = tosc_writeMessage(buffer, sizeof(buffer), "/hello", "fi", 1.0f, 2);
   tosc_printOscBuffer(buffer, len);
+
+  printf("Sending to %s:%d\n", out_addr, out_port);
+
+  int res = send(fd_send, buffer, len, 0);
+  printf("total bytes sent: %d\n", res);
+
   printf("done.\n");
+
+  // close the UDP socket
+#ifdef _WIN32
+  closesocket(fd_send);
+#else
+  close(fd_send);
+#endif
 
   // register the SIGINT handler (Ctrl+C)
   signal(SIGINT, &sigintHandler);
