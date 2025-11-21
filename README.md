@@ -17,7 +17,7 @@ options:
 ### OSC
 
 - /manymouse/relmotion 3 1 -1 (type tags: iii)
-    - device index, axis, delta
+    - device index, axis (0/horizontal or 1/vertical), delta
 
 ## Build
 
@@ -30,4 +30,5 @@ cmake --build build --parallel 8 -j 8 --config Release
 
 - [tinyosc](https://github.com/funatsufumiya/tinyosc): ISC License / Copyright (c) 2015, Martin Roth <mhroth@gmail.com>
 - [manymouse](https://github.com/icculus/manymouse): Zlib License / Copyright (c) 2005-2022 Ryan C. Gordon <icculus@icculus.org>.
+
 - [argparse](https://github.com/pollyren/argparse?tab=MIT-1-ov-file): MIT License / Copyright (c) 2025 pollyren
