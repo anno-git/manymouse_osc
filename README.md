@@ -3,8 +3,21 @@
 Pure C implementation of manymouse osc sender. <br>
 Intended to get native delta values of mice (mouse) and trackballs, and use them from Unity or etc. 
 
-- Original code of manymouse: https://github.com/icculus/manymouse
-- Original code of tinyosc: https://github.com/funatsufumiya/tinyosc (forked ver)
+## Usage
+
+```txt
+manymouse_osc
+
+options:
+  -h, --help               show this help message and exit
+  -p, --port               OSC out port (default: 9000)
+  -t, --host               OSC out host (default: 127.0.0.1)
+```
+
+### OSC
+
+- /manymouse/relmotion 3 1 -1 (type tags: iii)
+    - device index, axis, delta
 
 ## Build
 
@@ -13,7 +26,8 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --parallel 8 -j 8 --config Release
 ```
 
-## License
+## License (Dependencies)
 
-- tinyosc: ISC License / Copyright (c) 2015, Martin Roth <mhroth@gmail.com>
-- manymouse: Zlib License / Copyright (c) 2005-2022 Ryan C. Gordon <icculus@icculus.org>.
+- [tinyosc](https://github.com/funatsufumiya/tinyosc): ISC License / Copyright (c) 2015, Martin Roth <mhroth@gmail.com>
+- [manymouse](https://github.com/icculus/manymouse): Zlib License / Copyright (c) 2005-2022 Ryan C. Gordon <icculus@icculus.org>.
+- [argparse](https://github.com/pollyren/argparse?tab=MIT-1-ov-file): MIT License / Copyright (c) 2025 pollyren

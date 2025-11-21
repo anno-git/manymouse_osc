@@ -19,6 +19,7 @@
 
 #include "tinyosc.h"
 #include "manymouse.h"
+#include "argparse.h"
 
 static volatile bool keepRunning = true;
 
@@ -44,6 +45,30 @@ int osc_send(SOCKET* fd, unsigned int device, unsigned int axis, int delta){
  */
 int main(int argc, char *argv[]) {
 
+  const char *osc_out_host = "127.0.0.1";
+  int osc_out_port = 9000;
+
+  argument_parser_t arg_parser;
+  argparse_init(&arg_parser, argc, argv, "manymouse_osc", "");
+
+  // argparse_arg_t arg2 = ARGPARSE_OPTION(
+  //     INT, 'p', "--port", &osc_out_port, "OSC out port"
+  // );
+
+  // argparse_arg_t arg3 = ARGPARSE_OPTION(
+  //     STRING, 'ht', "--host", &osc_out_host, "OSC out host"
+  // );
+
+  argparse_arg_t args[] = {
+    ARGPARSE_OPTION(INT, 'p', "--port", &osc_out_port, "OSC out port (default: 9000)"),
+    ARGPARSE_OPTION(STRING, 't', "--host", &osc_out_host, "OSC out host (default: 127.0.0.1)")
+  };
+  argparse_add_arguments(&arg_parser, args, 2);
+
+
+  argparse_parse_args(&arg_parser);
+  // argparse_print_help(&arg_parser);
+
 #ifdef _WIN32
     WSADATA wsaData;
     int result = WSAStartup(MAKEWORD(2,2), &wsaData);
@@ -68,16 +93,14 @@ int main(int argc, char *argv[]) {
   sout.sin_family = AF_INET;
   // sout.sin_addr.s_addr = "127.0.0.1";
   // sout.sin_addr = "127.0.0.1";
-  const char* out_addr = "127.0.0.1";
-  int out_port = 9001;
   struct hostent *hostinfo;
-  hostinfo = gethostbyname(out_addr);
+  hostinfo = gethostbyname(osc_out_host);
   memcpy(&sout.sin_addr, hostinfo->h_addr_list[0], hostinfo->h_length);
-  sout.sin_port = htons(out_port);
+  sout.sin_port = htons(osc_out_port);
 
   int resb = connect(fd_send, (struct sockaddr*)&sout, sizeof(struct sockaddr_in));
 
-  printf("Connecting to %s:%d\n", out_addr, out_port);
+  printf("Connecting to %s:%d\n", osc_out_host, osc_out_port);
 
   if(resb < 0){
     printf("Failed to connect, result: %d\n", resb);
